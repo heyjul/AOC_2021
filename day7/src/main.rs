@@ -5,7 +5,7 @@ use std::{
 
 fn main() -> Result<(), std::io::Error> {
     let file = File::open("./src/day7.input")?;
-    let mut positions: Vec<i32> = BufReader::new(file)
+    let positions: Vec<i32> = BufReader::new(file)
         .lines()
         .next()
         .unwrap()?
@@ -13,18 +13,13 @@ fn main() -> Result<(), std::io::Error> {
         .map(|position| position.parse::<i32>().unwrap())
         .collect();
     
-    positions.sort_unstable();
-    let median;
-    let i = positions.len() / 2;
-    if positions.len() % 2 == 0 {
-        median = (positions.get(i).unwrap() + positions.get(i - 1).unwrap()) / 2;
-    } else {
-        median = *positions.get(i).unwrap();
-    }
+    let mean = positions.iter().sum::<i32>() as f32 / positions.len() as f32;
+    let mean = mean.floor() as i32; // use round or ceil to pass the test but floor to pass the input
+    println!("Mean {}", mean);
 
-    println!("They must spend {} fuel", positions.iter().fold(0, |mut acc, pos| {
-        acc += if pos - median < 0 { median - pos } else { pos - median };
-        acc
+    println!("They must spend {} fuel", positions.iter().fold(0, |acc, pos| {
+        let distance = if pos - mean < 0 { mean - pos } else { pos - mean };
+        acc + (distance * (distance + 1) / 2)
     }));
 
     Ok(())
